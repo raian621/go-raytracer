@@ -1,6 +1,7 @@
 package lalg
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -193,4 +194,33 @@ func Mat4Cofactor(m *Mat4, row, col int) float64 {
 		return Mat4Minor(m, row, col)
 	}
 	return -Mat4Minor(m, row, col)
+}
+
+func Mat4Determinant(m *Mat4) float64 {
+	return m[0][0]*Mat4Cofactor(m, 0, 0) +
+		m[0][1]*Mat4Cofactor(m, 0, 1) +
+		m[0][2]*Mat4Cofactor(m, 0, 2) +
+		m[0][3]*Mat4Cofactor(m, 0, 3)
+}
+
+func Mat4Adjoint(m *Mat4) *Mat4 {
+	adjoint := Mat4Zero()
+
+	for row := 0; row < 4; row++ {
+		for col := 0; col < 4; col++ {
+			adjoint[row][col] = Mat4Cofactor(m, row, col)
+		}
+	}
+
+	return Mat4Transpose(adjoint)
+}
+
+func Mat4Inverse(m *Mat4) (*Mat4, error) {
+	determinant := Mat4Determinant(m)
+	if determinant == 0 {
+		return m, errors.New("Matrix is not invertible")
+	}
+
+	inverse := Mat4MultScalar(Mat4Adjoint(m), 1/determinant)
+	return inverse, nil
 }

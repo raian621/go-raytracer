@@ -178,3 +178,53 @@ func TestMat4MinorAndCofactor(t *testing.T) {
 		t.Logf("%f, %f\n", eCofactor, cofactor)
 	}
 }
+
+func TestMat4Determinant(t *testing.T) {
+	m := &lalg.Mat4{
+		&lalg.Vec4{-2, -8, 3, 5},
+		&lalg.Vec4{-3, 1, 7, 3},
+		&lalg.Vec4{1, 2, -9, 6},
+		&lalg.Vec4{-6, 7, 7, -9},
+	}
+	determinant := lalg.Mat4Determinant(m)
+	var e float64 = -4071
+
+	if math.Abs(determinant-e) != 0 {
+		t.Errorf("determinant: %f", determinant)
+		t.Errorf("e:           %f", e)
+	}
+}
+
+func TestUninvertibleMat4(t *testing.T) {
+	m := &lalg.Mat4{
+		&lalg.Vec4{-2, -8, 3, 5},
+		&lalg.Vec4{-3, 1, 7, 3},
+		&lalg.Vec4{1, 2, -9, 6},
+		&lalg.Vec4{0, 0, 0, 0},
+	}
+	_, err := lalg.Mat4Inverse(m)
+	if err == nil {
+		t.Errorf("Error was not returned when uninvertible matrix was passed")
+	}
+}
+
+func TestMat4Inverse(t *testing.T) {
+	m := &lalg.Mat4{
+		&lalg.Vec4{8, -5, 9, 2},
+		&lalg.Vec4{7, 5, 6, 1},
+		&lalg.Vec4{-6, 0, 9, 6},
+		&lalg.Vec4{-3, 0, -9, -4},
+	}
+	inverse, _ := lalg.Mat4Inverse(m)
+	e := &lalg.Mat4{
+		&lalg.Vec4{-0.15385, -0.15385, -0.28205, -0.53846},
+		&lalg.Vec4{-0.07692, 0.12308, 0.02564, 0.03077},
+		&lalg.Vec4{0.35897, 0.35897, 0.43590, 0.92308},
+		&lalg.Vec4{-0.69231, -0.69231, -0.76923, -1.92308},
+	}
+
+	rowCmp, _ := lalg.Mat4Cmp(inverse, e)
+	if rowCmp != 0 {
+		t.Error(inverse.Stringify())
+	}
+}
