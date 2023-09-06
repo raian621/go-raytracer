@@ -17,7 +17,7 @@ jobs:
       - name: Install dependencies
         run: | 
           # downgrade go version to 1.21:
-          go get go@1.21
+          go get go@1.21.0
           go mod tidy
 
       - name: Finally run the unit tests
